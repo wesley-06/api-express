@@ -1,93 +1,147 @@
-# 📦 API CRUD de Usuários — Node.js (sem dependências)
+# API Escola — Node.js + Express + PostgreSQL (Supabase)
 
-API didática para aulas de desenvolvimento web. Roda com **Node.js puro**, sem
-instalar nada.
-
----
-
-## ▶️ Como rodar
-
-```bash
-node index.js
-```
-
-Servidor inicia em `http://localhost:3000`
+API didática para aulas de desenvolvimento web com CRUD de alunos, professores,
+disciplinas e turmas, usando **Express** e **PostgreSQL** (Supabase) via `pg`.
 
 ---
 
-## 🗂️ Rotas
+## Como rodar
 
-| Método   | URL           | Ação                     |
-|----------|---------------|--------------------------|
-| GET      | /users        | Lista todos os usuários  |
-| GET      | /users/:id    | Busca um usuário por ID  |
-| POST     | /users        | Cria um novo usuário     |
-| PUT      | /users/:id    | Atualiza (substitui)     |
-| PATCH    | /users/:id    | Atualiza parcialmente    |
-| DELETE   | /users/:id    | Remove um usuário        |
+1. Instale as dependências:
+
+```bash
+npm install
+```
+
+2. Crie o arquivo `.env` na raiz:
+
+```env
+PORT=3000
+DATABASE_URL=postgresql://usuario:senha@host:6543/postgres
+```
+
+3. No **SQL Editor** do Supabase, execute na ordem:
+   - `schema.sql` (cria as tabelas)
+   - `dados-iniciais.sql` (dados de exemplo)
+
+4. Inicie o servidor:
+
+```bash
+npm run dev
+```
+
+Servidor em `http://localhost:3000`
 
 ---
 
-## 📋 Exemplos com `curl`
+## Modelagem
 
-### Listar todos
-```bash
-curl http://localhost:3000/users
-```
+- **alunos**: `id`, `nome`, `email` (único), `nascimento`
+- **professores**: `id`, `nome`, `email` (único), `nascimento`
+- **disciplinas**: `id`, `nome`, `codigo` (único)
+- **turmas**: `id`, `nome`, `disciplina_id`, `professor_id`
+- **turma_alunos**: `turma_id`, `aluno_id` (relação N:N entre turmas e alunos)
 
-### Buscar por ID
-```bash
-curl http://localhost:3000/users/1
-```
+---
 
-### Criar usuário
+## Rotas
+
+| Método | URL                                  | Ação                                   |
+|--------|--------------------------------------|----------------------------------------|
+| GET    | /alunos                              | Lista alunos com suas turmas           |
+| POST   | /alunos                              | Cria aluno                             |
+| PUT    | /alunos/:id                          | Atualiza aluno                         |
+| DELETE | /alunos/:id                          | Remove aluno                           |
+| GET    | /professores                         | Lista professores com suas turmas      |
+| POST   | /professores                         | Cria professor                         |
+| PUT    | /professores/:id                     | Atualiza professor                     |
+| DELETE | /professores/:id                     | Remove professor                       |
+| GET    | /disciplinas                         | Lista disciplinas                      |
+| POST   | /disciplinas                         | Cria disciplina                        |
+| PUT    | /disciplinas/:id                     | Atualiza disciplina                    |
+| DELETE | /disciplinas/:id                     | Remove disciplina                      |
+| GET    | /turmas                              | Lista turmas com professor e alunos    |
+| POST   | /turmas                              | Cria turma                             |
+| PUT    | /turmas/:id                          | Atualiza turma                         |
+| DELETE | /turmas/:id                          | Remove turma                           |
+| GET    | /matriculas                          | Lista vínculos turma/aluno             |
+| POST   | /matriculas                          | Matricula um aluno em uma turma        |
+| DELETE | /matriculas/:turma_id/:aluno_id      | Remove a matrícula                     |
+
+---
+
+## Exemplos com `curl`
+
+### Criar aluno
 ```bash
-curl -X POST http://localhost:3000/users \
+curl -X POST http://localhost:3000/alunos \
   -H "Content-Type: application/json" \
-  -d '{"name": "Carlos Souza", "email": "carlos@email.com", "age": 22}'
+  -d '{"nome": "Carlos Souza", "email": "carlos@aluno.com", "nascimento": "2001-04-12"}'
 ```
 
-### Atualizar completo (PUT)
+### Criar disciplina
 ```bash
-curl -X PUT http://localhost:3000/users/1 \
+curl -X POST http://localhost:3000/disciplinas \
   -H "Content-Type: application/json" \
-  -d '{"name": "Ana Silva Atualizada", "email": "ana.nova@email.com", "age": 29}'
+  -d '{"nome": "Programação Web", "codigo": "PWEB101"}'
 ```
 
-### Atualizar parcial (PATCH)
+### Criar turma
 ```bash
-curl -X PATCH http://localhost:3000/users/1 \
+curl -X POST http://localhost:3000/turmas \
   -H "Content-Type: application/json" \
-  -d '{"age": 30}'
+  -d '{"nome": "PWEB 2026.1", "disciplina_id": 1, "professor_id": 1}'
 ```
 
-### Deletar
+### Matricular aluno em turma
 ```bash
-curl -X DELETE http://localhost:3000/users/2
+curl -X POST http://localhost:3000/matriculas \
+  -H "Content-Type: application/json" \
+  -d '{"turma_id": 1, "aluno_id": 1}'
+```
+
+### Remover matrícula
+```bash
+curl -X DELETE http://localhost:3000/matriculas/1/1
 ```
 
 ---
 
-## 📐 Formato do usuário
+## Formato das respostas de listagem
 
+### Aluno
 ```json
 {
   "id": 1,
-  "name": "Ana Silva",
-  "email": "ana@email.com",
-  "age": 28
+  "nome": "João Pedro Alves",
+  "email": "joao.alves@aluno.com",
+  "nascimento": "2003-05-10T00:00:00.000Z",
+  "turmas": [
+    {
+      "id": 1,
+      "nome": "PWEB 2026.1",
+      "disciplina": { "id": 1, "nome": "Programação Web", "codigo": "PWEB101" },
+      "professor": { "id": 1, "nome": "Ana Beatriz Souza", "email": "ana.souza@escola.com" }
+    }
+  ]
 }
 ```
 
-- `id` — gerado automaticamente, não pode ser alterado
-- `name` e `email` — obrigatórios no POST e PUT
-- `age` — opcional
+### Turma
+```json
+{
+  "id": 1,
+  "nome": "PWEB 2026.1",
+  "disciplina_id": 1,
+  "professor_id": 1,
+  "professor": { "id": 1, "nome": "Ana Beatriz Souza" },
+  "alunos": [{ "id": 1, "nome": "João Pedro Alves" }]
+}
+```
 
 ---
 
-## ⚠️ Observações para a aula
+## Observações
 
-- Os dados ficam **somente na memória RAM** — reiniciar o servidor apaga tudo.
-- Não há autenticação — propositalmente simples para fins didáticos.
-- Próximos passos sugeridos: adicionar banco de dados (SQLite, MongoDB), usar
-  Express.js, adicionar validação com Zod, implementar JWT.
+- O `.env` está no `.gitignore` — não versione suas credenciais.
+- Não há autenticação, propositalmente, para fins didáticos.
