@@ -1,11 +1,10 @@
 import { Router } from 'express'
-import * as controlador from '../controlador/turma-controlador.js'
+import * as controlador from '../controlador/matricula-controlador.js'
 
 const router = Router()
 
 router.get('/matriculas', controlador.listar)
 router.post('/matriculas', controlador.criar)
-router.put('/matriculas/:id', controlador.editar)
-router.delete('/matriculas/:id', controlador.deletar)
+router.delete('/matriculas/:turma_id/:aluno_id', controlador.deletar)
 
 export const matriculasRoutes = router

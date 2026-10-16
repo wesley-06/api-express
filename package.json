@@ -4,7 +4,7 @@
   "description": "API didática para aulas de desenvolvimento web. Roda com **Node.js puro**, sem\r instalar nada.",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch index.js",
+    "dev": "node --env-file=.env --watch index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,6 +21,6 @@
   "homepage": "https://github.com/wesleygomesc6/api-express#readme",
   "dependencies": {
     "express": "^5.2.1",
-    "mysql2": "^3.24.4"
+    "pg": "^8.23.1"
   }
 }

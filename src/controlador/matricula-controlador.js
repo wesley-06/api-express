@@ -1,27 +1,31 @@
 import conexao from '../dados/db.js'
 
+// Matrícula = vínculo aluno <-> turma (tabela turma_alunos)
 const listar = async (pedido, resposta) => {
-    const [matriculas] = await conexao.query('SELECT * FROM matriculas')
-    resposta.json(matriculas)
+    const { rows } = await conexao.query('SELECT * FROM turma_alunos')
+    resposta.json(rows)
 }
 
 const criar = async (pedido, resposta) => {
-    const { id_aluno, id_turma } = pedido.body
+    const { turma_id, aluno_id } = pedido.body
 
-    const [resultado] = await conexao.query(
-        'INSERT INTO matriculas (id_aluno, id_turma) VALUES (?, ?)',
-        [id_aluno, id_turma]
+    const { rows } = await conexao.query(
+        'INSERT INTO turma_alunos (turma_id, aluno_id) VALUES ($1, $2) RETURNING *',
+        [turma_id, aluno_id]
     )
 
-    resposta.json({ id: resultado.insertId, id_aluno, id_turma })
+    resposta.json(rows[0])
 }
 
 const deletar = async (pedido, resposta) => {
-    const { id } = pedido.params
+    const { turma_id, aluno_id } = pedido.params
 
-    const [resultado] = await conexao.query('DELETE FROM matriculas WHERE id = ?', [id])
+    const resultado = await conexao.query(
+        'DELETE FROM turma_alunos WHERE turma_id = $1 AND aluno_id = $2',
+        [turma_id, aluno_id]
+    )
 
-    if (resultado.affectedRows === 0) {
+    if (resultado.rowCount === 0) {
         return resposta.json({ mensagem: 'Matrícula não encontrada!' })
     }
     resposta.json({ mensagem: 'Matrícula removida com sucesso!' })
