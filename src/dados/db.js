@@ -1,11 +1,8 @@
-import mysql from 'mysql2/promise'
+import pg from 'pg'
 
-const banco = await mysql.createConnection({
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  password: 'root',
-  database: 'escola',
+const banco = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
 })
 
 export default banco
