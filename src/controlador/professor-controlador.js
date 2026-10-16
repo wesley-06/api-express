@@ -1,40 +1,43 @@
-import { professores } from '../dados/db.js'
+import banco from '../dados/db.js'
 
-const listar = ((pedido, resposta) => {
+const listar = async (pedido, resposta) => {
+    const [professores] = await banco.query('SELECT * FROM professores')
     resposta.json(professores)
-})
+}
 
-const criar = ((pedido, resposta) => {
-    const professor = {
-        id: professores.length + 1,
-        matricula: pedido.body.matricula,
-        nome: pedido.body.nome,
-        dataNasc: pedido.body.dataNasc,
-        email: pedido.body.email
+const criar = async (pedido, resposta) => {
+    const {matricula, nome, dataNasc, email} = pedido.body
+    const [resultado] = await banco.query('INSERT INTO professores (matricula, nome, dataNasc, email) VALUES (?,?,?,?)',
+        [matricula,nome,dataNasc,email]
+    )
+
+    resposta.json({id: resultado.insertId, matricula, nome, dataNasc, email})
+}
+
+const editar = async (pedido, resposta) => {
+    const {matricula, nome, dataNasc, email} = pedido.body
+    const { id } = pedido.params
+
+    const [resultado] = await banco.query(
+        'UPDATE professores SET matricula = ?, nome = ?, dataNasc = ?, email = ? WHERE id = ?',
+    [matricula,nome,dataNasc,email, id])
+
+    if(resultado.affectedRows === 0) {
+        resposta.json({ mensagem: 'professor não encontrado!'})
     }
 
-    professores.push(professor)
+    resposta.json({mensagem: 'professor editado com sucesso!'})
+}
 
-    resposta.json(professor)
-})
+const deletar = async (pedido,resposta) => {
+    const { id } = pedido.params
+    const [resultado] = await banco.query('DELETE FROM professores WHERE id = ?', [id])
 
-const editar = ( (pedido, resposta) => {
-    const index = professores.findIndex(professor => professor.id == pedido.params.id)
-    if(index === -1) {
-        return resposta.json({mensagem: 'professor não encontrado!'})
+    if(resultado.affectedRows === 0) {
+        resposta.json({ mensagem: 'professor não encontrado!'})
     }
-    professores[index] = { ...professores[index], ...pedido.body}
-    resposta.json(professores[index])
-})
-
-const deletar = ( (pedido, resposta) => {
-    const index = professores.findIndex(professor => professor.id === pedido.params.id)
-    if(index === -1) {
-        return resposta.json({mensagem: 'professor não encontrado!'})
-    }
-    professores.splice(index, 1)
-    resposta.json({mensagem: 'professor deletado com sucesso!'})
-})
-
+    
+    resposta.json({ mensagem: 'professor deletado com sucesso!'})
+}
 
 export { listar, criar, editar, deletar }

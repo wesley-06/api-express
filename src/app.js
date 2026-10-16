@@ -4,6 +4,7 @@ import { professoresRoutes } from './rotas/professor.js'
 import { disciplinasRoutes } from './rotas/disciplinas.js'
 import { cursosRoutes } from './rotas/cursos.js'
 import { turmasRoutes } from './rotas/turmas.js'
+import { matriculasRoutes } from './rotas/matricula.js'
 
 const app = express()
 
@@ -13,5 +14,6 @@ app.use(professoresRoutes)
 app.use(disciplinasRoutes)
 app.use(cursosRoutes)
 app.use(turmasRoutes)
+app.use(matriculasRoutes)
 
 export default app

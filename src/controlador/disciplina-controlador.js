@@ -1,38 +1,43 @@
-import { disciplinas } from '../dados/db.js'
+import banco from '../dados/db.js'
 
-const listar = ((pedido, resposta) => {
+const listar = async (pedido, resposta) => {
+    const [disciplinas] = await banco.query('SELECT * FROM disciplinas')
     resposta.json(disciplinas)
-})
+}
 
-const criar = ((pedido, resposta) => {
-    const disciplina = {
-        id: disciplinas.length + 1,
-        nome: pedido.body.nome,
-        codigo: pedido.body.codigo
+const criar = async (pedido, resposta) => {
+    const {nome,codigo,id_curso} = pedido.body
+    const [resultado] = await banco.query('INSERT INTO disciplinas (nome,codigo,id_curso) VALUES (?,?,?)',
+        [nome,codigo,id_curso]
+    )
+
+    resposta.json({id: resultado.insertId, nome,codigo,id_curso})
+}
+
+const editar = async (pedido, resposta) => {
+    const {nome,codigo,id_curso} = pedido.body
+    const { id } = pedido.params
+
+    const [resultado] = await banco.query(
+        'UPDATE disciplinas SET nome = ?, codigo = ?, id_curso = ? WHERE  id = ?',
+    [nome,codigo,id_curso, id])
+
+    if(resultado.affectedRows === 0) {
+        resposta.json({ mensagem: 'disciplina não encontrado!'})
     }
 
-    disciplinas.push(disciplina)
+    resposta.json({mensagem: 'disciplina editado com sucesso!'})
+}
 
-    resposta.json(disciplina)
-})
+const deletar = async (pedido,resposta) => {
+    const { id } = pedido.params
+    const [resultado] = await banco.query('DELETE FROM disciplinas WHERE id = ?', [id])
 
-const editar = ( (pedido, resposta) => {
-    const index = disciplinas.findIndex(disciplina => disciplina.id == pedido.params.id)
-    if(index === -1) {
-        return resposta.json({mensagem: 'disciplina não encontrado!'})
+    if(resultado.affectedRows === 0) {
+        resposta.json({ mensagem: 'disciplina não encontrado!'})
     }
-    disciplinas[index] = { ...disciplinas[index], ...pedido.body}
-    resposta.json(disciplinas[index])
-})
-
-const deletar = ( (pedido, resposta) => {
-    const index = disciplinas.findIndex(disciplina => disciplina.id === pedido.params.id)
-    if(index === -1) {
-        return resposta.json({mensagem: 'disciplina não encontrado!'})
-    }
-    disciplinas.splice(index, 1)
-    resposta.json({mensagem: 'disciplina deletado com sucesso!'})
-})
-
+    
+    resposta.json({ mensagem: 'disciplina deletado com sucesso!'})
+}
 
 export { listar, criar, editar, deletar }
