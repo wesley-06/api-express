@@ -4,21 +4,25 @@
   "description": "API didática para aulas de desenvolvimento web. Roda com **Node.js puro**, sem\r instalar nada.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "dev": "node --env-file=.env --watch index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wesleygomesc6/api-express.git"
+    "url": "git+https://github.com/wesley-06/api-express.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
-  "bugs": {
-    "url": "https://github.com/wesleygomesc6/api-express/issues"
+  "engines": {
+    "node": ">=20.6"
   },
-  "homepage": "https://github.com/wesleygomesc6/api-express#readme",
+  "bugs": {
+    "url": "https://github.com/wesley-06/api-express/issues"
+  },
+  "homepage": "https://github.com/wesley-06/api-express#readme",
   "dependencies": {
     "express": "^5.2.1",
     "pg": "^8.23.1"
