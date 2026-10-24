@@ -36,11 +36,13 @@ Servidor em `http://localhost:3000`
 
 ## Modelagem
 
-- **alunos**: `id`, `nome`, `email` (único), `nascimento`
-- **professores**: `id`, `nome`, `email` (único), `nascimento`
+- **cursos**: `id`, `nome`, `codigo` (único)
+- **alunos**: `id`, `matricula` (única), `nome`, `email` (único), `nascimento`, `curso_id`
+- **professores**: `id`, `matricula` (única), `nome`, `email` (único), `nascimento`
 - **disciplinas**: `id`, `nome`, `codigo` (único)
 - **turmas**: `id`, `nome`, `disciplina_id`, `professor_id`
 - **turma_alunos**: `turma_id`, `aluno_id` (relação N:N entre turmas e alunos)
+- **curso_disciplinas**: `curso_id`, `disciplina_id` (relação N:N entre cursos e disciplinas)
 
 ---
 
@@ -48,15 +50,15 @@ Servidor em `http://localhost:3000`
 
 | Método | URL                                  | Ação                                   |
 |--------|--------------------------------------|----------------------------------------|
-| GET    | /alunos                              | Lista alunos com suas turmas           |
+| GET    | /alunos                              | Lista alunos com curso e turmas        |
 | POST   | /alunos                              | Cria aluno                             |
 | PUT    | /alunos/:id                          | Atualiza aluno                         |
 | DELETE | /alunos/:id                          | Remove aluno                           |
-| GET    | /professores                         | Lista professores com suas turmas      |
+| GET    | /professores                         | Lista professores com turmas e cursos  |
 | POST   | /professores                         | Cria professor                         |
 | PUT    | /professores/:id                     | Atualiza professor                     |
 | DELETE | /professores/:id                     | Remove professor                       |
-| GET    | /disciplinas                         | Lista disciplinas                      |
+| GET    | /disciplinas                         | Lista disciplinas com seus cursos      |
 | POST   | /disciplinas                         | Cria disciplina                        |
 | PUT    | /disciplinas/:id                     | Atualiza disciplina                    |
 | DELETE | /disciplinas/:id                     | Remove disciplina                      |
@@ -67,6 +69,12 @@ Servidor em `http://localhost:3000`
 | GET    | /matriculas                          | Lista vínculos turma/aluno             |
 | POST   | /matriculas                          | Matricula um aluno em uma turma        |
 | DELETE | /matriculas/:turma_id/:aluno_id      | Remove a matrícula                     |
+| GET    | /cursos                              | Lista cursos com suas disciplinas      |
+| POST   | /cursos                              | Cria curso                             |
+| PUT    | /cursos/:id                          | Atualiza curso                         |
+| DELETE | /cursos/:id                          | Remove curso                           |
+| POST   | /cursos/:id/disciplinas              | Vincula disciplina ao curso            |
+| DELETE | /cursos/:id/disciplinas/:disciplina_id | Remove disciplina do curso           |
 
 ---
 
@@ -76,7 +84,7 @@ Servidor em `http://localhost:3000`
 ```bash
 curl -X POST http://localhost:3000/alunos \
   -H "Content-Type: application/json" \
-  -d '{"nome": "Carlos Souza", "email": "carlos@aluno.com", "nascimento": "2001-04-12"}'
+  -d '{"matricula": "2026100005", "nome": "Carlos Souza", "email": "carlos@aluno.com", "nascimento": "2001-04-12", "curso_id": 1}'
 ```
 
 ### Criar disciplina

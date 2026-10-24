@@ -5,6 +5,7 @@ const listar = async (pedido, resposta) => {
         SELECT t.*,
             json_build_object(
                 'id', p.id,
+                'matricula', p.matricula,
                 'nome', p.nome,
                 'email', p.email,
                 'nascimento', p.nascimento
@@ -12,6 +13,7 @@ const listar = async (pedido, resposta) => {
             COALESCE(
                 json_agg(json_build_object(
                     'id', a.id,
+                    'matricula', a.matricula,
                     'nome', a.nome,
                     'email', a.email,
                     'nascimento', a.nascimento

@@ -1,7 +1,22 @@
 import banco from '../dados/db.js'
 
 const listar = async (pedido, resposta) => {
-    const { rows } = await banco.query('SELECT * FROM disciplinas')
+    const { rows } = await banco.query(`
+        SELECT d.*,
+            COALESCE(
+                json_agg(json_build_object(
+                    'id', c.id,
+                    'nome', c.nome,
+                    'codigo', c.codigo
+                ) ORDER BY c.id) FILTER (WHERE c.id IS NOT NULL),
+                '[]'
+            ) AS cursos
+        FROM disciplinas d
+        LEFT JOIN curso_disciplinas cd ON cd.disciplina_id = d.id
+        LEFT JOIN cursos c ON c.id = cd.curso_id
+        GROUP BY d.id
+        ORDER BY d.id
+    `)
     resposta.json(rows)
 }
 
