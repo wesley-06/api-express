@@ -149,6 +149,24 @@ curl -X DELETE http://localhost:3000/matriculas/1/1
 
 ---
 
+## Deploy no Render
+
+1. Envie o código para o GitHub.
+2. No Render, clique em **New > Web Service** e vincule o repositório.
+3. Preencha:
+   - **Language:** `Node`
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+4. Em **Environment Variables**, adicione `DATABASE_URL`
+   (a porta `PORT` é definida pelo próprio Render).
+5. Após o deploy, acesse a URL gerada (ex.: `https://api-express.onrender.com/`).
+
+> **Importante (Supabase):** use a connection string do **Session pooler**
+> (`...pooler.supabase.com`), disponível em *Connect* no painel do Supabase.
+> A conexão direta (`db.xxxx.supabase.co`) usa apenas IPv6, que o Render não suporta.
+
+---
+
 ## Observações
 
 - O `.env` está no `.gitignore` — não versione suas credenciais.

@@ -1,5 +1,8 @@
 import app from './src/app.js'
 
-app.listen(3000, () => {
-	console.log(`Servidor iniciado em http://localhost:3000`)
+// No Render a porta é definida pela variável de ambiente PORT
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, () => {
+	console.log(`Servidor iniciado na porta ${PORT}`)
 })

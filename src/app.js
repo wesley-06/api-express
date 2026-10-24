@@ -9,6 +9,12 @@ import { cursosRoutes } from './rotas/cursos.js'
 const app = express()
 
 app.use(express.json())
+
+// Rota raiz: usada como health check pelo Render
+app.get('/', (pedido, resposta) => {
+    resposta.json({ status: 'ok', mensagem: 'API Escola no ar!' })
+})
+
 app.use(alunosRoutes)
 app.use(professoresRoutes)
 app.use(disciplinasRoutes)
