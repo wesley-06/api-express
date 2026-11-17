@@ -7,12 +7,20 @@ INSERT INTO professores (matricula, nome, email, nascimento) VALUES
 ('P0002', 'Carlos Eduardo Lima', 'carlos.lima@escola.com', '1975-07-22'),
 ('P0003', 'Fernanda Ribeiro', 'fernanda.ribeiro@escola.com', '1985-11-30');
 
--- Alunos (matricula, nome, email, nascimento, curso_id)
-INSERT INTO alunos (matricula, nome, email, nascimento, curso_id) VALUES
-('2026100001', 'João Pedro Alves', 'joao.alves@aluno.com', '2003-05-10', 1),
-('2026100002', 'Maria Clara Santos', 'maria.santos@aluno.com', '2002-09-18', 1),
-('2026100003', 'Lucas Gabriel Costa', 'lucas.costa@aluno.com', '2004-01-25', 2),
-('2026100004', 'Beatriz Oliveira', 'beatriz.oliveira@aluno.com', '2003-12-02', 2);
+-- Alunos (matricula, nome, email, nascimento)
+INSERT INTO alunos (matricula, nome, email, nascimento) VALUES
+('2026100001', 'João Pedro Alves', 'joao.alves@aluno.com', '2003-05-10'),
+('2026100002', 'Maria Clara Santos', 'maria.santos@aluno.com', '2002-09-18'),
+('2026100003', 'Lucas Gabriel Costa', 'lucas.costa@aluno.com', '2004-01-25'),
+('2026100004', 'Beatriz Oliveira', 'beatriz.oliveira@aluno.com', '2003-12-02');
+
+-- Cursos de cada aluno
+INSERT INTO aluno_cursos (aluno_id, curso_id) VALUES
+(1, 1),
+(1, 2),
+(2, 1),
+(3, 2),
+(4, 2);
 
 INSERT INTO disciplinas (nome, codigo) VALUES
 ('Programação Web', 'PWEB101'),
