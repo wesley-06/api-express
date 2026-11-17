@@ -37,7 +37,8 @@ Servidor em `http://localhost:3000`
 ## Modelagem
 
 - **cursos**: `id`, `nome`, `codigo` (único)
-- **alunos**: `id`, `matricula` (única), `nome`, `email` (único), `nascimento`, `curso_id`
+- **alunos**: `id`, `matricula` (única), `nome`, `email` (único), `nascimento`
+- **aluno_cursos**: `aluno_id`, `curso_id` (relação N:N entre alunos e cursos)
 - **professores**: `id`, `matricula` (única), `nome`, `email` (único), `nascimento`
 - **disciplinas**: `id`, `nome`, `codigo` (único)
 - **turmas**: `id`, `nome`, `disciplina_id`, `professor_id`
@@ -50,7 +51,7 @@ Servidor em `http://localhost:3000`
 
 | Método | URL                                  | Ação                                   |
 |--------|--------------------------------------|----------------------------------------|
-| GET    | /alunos                              | Lista alunos com curso e turmas        |
+| GET    | /alunos                              | Lista alunos com suas turmas           |
 | POST   | /alunos                              | Cria aluno                             |
 | PUT    | /alunos/:id                          | Atualiza aluno                         |
 | DELETE | /alunos/:id                          | Remove aluno                           |
@@ -75,6 +76,8 @@ Servidor em `http://localhost:3000`
 | DELETE | /cursos/:id                          | Remove curso                           |
 | POST   | /cursos/:id/disciplinas              | Vincula disciplina ao curso            |
 | DELETE | /cursos/:id/disciplinas/:disciplina_id | Remove disciplina do curso           |
+| POST   | /cursos/:id/alunos                   | Vincula aluno ao curso                 |
+| DELETE | /cursos/:id/alunos/:aluno_id          | Remove aluno do curso                  |
 
 ---
 
@@ -84,8 +87,10 @@ Servidor em `http://localhost:3000`
 ```bash
 curl -X POST http://localhost:3000/alunos \
   -H "Content-Type: application/json" \
-  -d '{"matricula": "2026100005", "nome": "Carlos Souza", "email": "carlos@aluno.com", "nascimento": "2001-04-12", "curso_id": 1}'
+  -d '{"matricula": "2026100005", "nome": "Carlos Souza", "email": "carlos@aluno.com", "nascimento": "2001-04-12"}'
 ```
+
+Os cursos são vinculados separadamente pelo controller de cursos.
 
 ### Criar disciplina
 ```bash

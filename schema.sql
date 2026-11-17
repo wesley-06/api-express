@@ -5,14 +5,19 @@ CREATE TABLE cursos (
     codigo TEXT NOT NULL UNIQUE
 );
 
--- Aluno: pertence a um curso
 CREATE TABLE alunos (
     id SERIAL PRIMARY KEY,
     matricula TEXT NOT NULL UNIQUE,
     nome TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    nascimento TIMESTAMP(3) NOT NULL,
-    curso_id INT NOT NULL REFERENCES cursos(id)
+    nascimento TIMESTAMP(3) NOT NULL
+);
+
+-- Relação muitos-para-muitos entre alunos e cursos
+CREATE TABLE aluno_cursos (
+    aluno_id INT NOT NULL REFERENCES alunos(id) ON DELETE CASCADE,
+    curso_id INT NOT NULL REFERENCES cursos(id) ON DELETE CASCADE,
+    PRIMARY KEY (aluno_id, curso_id)
 );
 
 CREATE TABLE disciplinas (
