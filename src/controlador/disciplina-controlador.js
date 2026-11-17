@@ -1,6 +1,7 @@
 import banco from '../dados/db.js'
+import tratarErro from './erros.js'
 
-const listar = async (pedido, resposta) => {
+const listar = tratarErro('listar disciplinas')(async (pedido, resposta) => {
     const { rows } = await banco.query(`
         SELECT d.*,
             COALESCE(
@@ -18,19 +19,19 @@ const listar = async (pedido, resposta) => {
         ORDER BY d.id
     `)
     resposta.json(rows)
-}
+})
 
-const criar = async (pedido, resposta) => {
+const criar = tratarErro('criar disciplina')(async (pedido, resposta) => {
     const { nome, codigo } = pedido.body
     const { rows } = await banco.query(
         'INSERT INTO disciplinas (nome, codigo) VALUES ($1,$2) RETURNING *',
         [nome, codigo]
     )
 
-    resposta.json(rows[0])
-}
+    resposta.status(201).json(rows[0])
+})
 
-const editar = async (pedido, resposta) => {
+const editar = tratarErro('editar disciplina')(async (pedido, resposta) => {
     const { nome, codigo } = pedido.body
     const { id } = pedido.params
 
@@ -39,21 +40,21 @@ const editar = async (pedido, resposta) => {
         [nome, codigo, id])
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'disciplina não encontrada!' })
+        return resposta.status(404).json({ mensagem: 'disciplina não encontrada!' })
     }
 
     resposta.json({ mensagem: 'disciplina editada com sucesso!' })
-}
+})
 
-const deletar = async (pedido, resposta) => {
+const deletar = tratarErro('deletar disciplina')(async (pedido, resposta) => {
     const { id } = pedido.params
     const resultado = await banco.query('DELETE FROM disciplinas WHERE id = $1', [id])
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'disciplina não encontrada!' })
+        return resposta.status(404).json({ mensagem: 'disciplina não encontrada!' })
     }
 
     resposta.json({ mensagem: 'disciplina deletada com sucesso!' })
-}
+})
 
 export { listar, criar, editar, deletar }

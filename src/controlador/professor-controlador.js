@@ -1,6 +1,7 @@
 import banco from '../dados/db.js'
+import tratarErro from './erros.js'
 
-const listar = async (pedido, resposta) => {
+const listar = tratarErro('listar professores')(async (pedido, resposta) => {
     const { rows } = await banco.query(`
         SELECT p.*,
             COALESCE(
@@ -38,19 +39,19 @@ const listar = async (pedido, resposta) => {
         ORDER BY p.id
     `)
     resposta.json(rows)
-}
+})
 
-const criar = async (pedido, resposta) => {
+const criar = tratarErro('criar professor')(async (pedido, resposta) => {
     const { matricula, nome, email, nascimento } = pedido.body
     const { rows } = await banco.query(
         'INSERT INTO professores (matricula, nome, email, nascimento) VALUES ($1,$2,$3,$4) RETURNING *',
         [matricula, nome, email, nascimento]
     )
 
-    resposta.json(rows[0])
-}
+    resposta.status(201).json(rows[0])
+})
 
-const editar = async (pedido, resposta) => {
+const editar = tratarErro('editar professor')(async (pedido, resposta) => {
     const { matricula, nome, email, nascimento } = pedido.body
     const { id } = pedido.params
 
@@ -59,21 +60,21 @@ const editar = async (pedido, resposta) => {
         [matricula, nome, email, nascimento, id])
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'professor não encontrado!' })
+        return resposta.status(404).json({ mensagem: 'professor não encontrado!' })
     }
 
     resposta.json({ mensagem: 'professor editado com sucesso!' })
-}
+})
 
-const deletar = async (pedido, resposta) => {
+const deletar = tratarErro('deletar professor')(async (pedido, resposta) => {
     const { id } = pedido.params
     const resultado = await banco.query('DELETE FROM professores WHERE id = $1', [id])
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'professor não encontrado!' })
+        return resposta.status(404).json({ mensagem: 'professor não encontrado!' })
     }
 
     resposta.json({ mensagem: 'professor deletado com sucesso!' })
-}
+})
 
 export { listar, criar, editar, deletar }

@@ -1,12 +1,13 @@
 import conexao from '../dados/db.js'
+import tratarErro from './erros.js'
 
 // Matrícula = vínculo aluno <-> turma (tabela turma_alunos)
-const listar = async (pedido, resposta) => {
+const listar = tratarErro('listar matrículas')(async (pedido, resposta) => {
     const { rows } = await conexao.query('SELECT * FROM turma_alunos')
     resposta.json(rows)
-}
+})
 
-const criar = async (pedido, resposta) => {
+const criar = tratarErro('criar matrícula')(async (pedido, resposta) => {
     const { turma_id, aluno_id } = pedido.body
 
     const { rows } = await conexao.query(
@@ -14,10 +15,10 @@ const criar = async (pedido, resposta) => {
         [turma_id, aluno_id]
     )
 
-    resposta.json(rows[0])
-}
+    resposta.status(201).json(rows[0])
+})
 
-const deletar = async (pedido, resposta) => {
+const deletar = tratarErro('remover matrícula')(async (pedido, resposta) => {
     const { turma_id, aluno_id } = pedido.params
 
     const resultado = await conexao.query(
@@ -26,9 +27,9 @@ const deletar = async (pedido, resposta) => {
     )
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'Matrícula não encontrada!' })
+        return resposta.status(404).json({ mensagem: 'Matrícula não encontrada!' })
     }
     resposta.json({ mensagem: 'Matrícula removida com sucesso!' })
-}
+})
 
 export { listar, criar, deletar }

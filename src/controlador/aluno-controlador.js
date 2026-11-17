@@ -1,6 +1,7 @@
 import banco from '../dados/db.js'
+import tratarErro from './erros.js'
 
-const listar = async (pedido, resposta) => {
+const listar = tratarErro('listar alunos')(async (pedido, resposta) => {
     const { rows } = await banco.query(`
         SELECT a.*,
             COALESCE(
@@ -33,9 +34,9 @@ const listar = async (pedido, resposta) => {
         ORDER BY a.id
     `)
     resposta.json(rows)
-}
+})
 
-const criar = async (pedido, resposta) => {
+const criar = tratarErro('criar aluno')(async (pedido, resposta) => {
     const { matricula, nome, email, nascimento } = pedido.body
     const { rows } = await banco.query(
         'INSERT INTO alunos (matricula, nome, email, nascimento) VALUES ($1,$2,$3,$4) RETURNING *',
@@ -43,9 +44,9 @@ const criar = async (pedido, resposta) => {
     )
 
     resposta.status(201).json(rows[0])
-}
+})
 
-const editar = async (pedido, resposta) => {
+const editar = tratarErro('editar aluno')(async (pedido, resposta) => {
     const { matricula, nome, email, nascimento } = pedido.body
     const { id } = pedido.params
     const resultado = await banco.query(
@@ -54,21 +55,21 @@ const editar = async (pedido, resposta) => {
     )
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'Aluno não encontrado!' })
+        return resposta.status(404).json({ mensagem: 'Aluno não encontrado!' })
     }
 
     resposta.json({ mensagem: 'Aluno editado com sucesso!' })
-}
+})
 
-const deletar = async (pedido, resposta) => {
+const deletar = tratarErro('deletar aluno')(async (pedido, resposta) => {
     const { id } = pedido.params
     const resultado = await banco.query('DELETE FROM alunos WHERE id = $1', [id])
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'Aluno não encontrado!' })
+        return resposta.status(404).json({ mensagem: 'Aluno não encontrado!' })
     }
 
     resposta.json({ mensagem: 'Aluno deletado com sucesso!' })
-}
+})
 
 export { listar, criar, editar, deletar }

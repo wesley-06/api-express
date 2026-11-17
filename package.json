@@ -25,6 +25,7 @@
   "homepage": "https://github.com/wesley-06/api-express#readme",
   "dependencies": {
     "express": "^5.2.1",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "swagger-ui-express": "^5.0.1"
   }
 }
