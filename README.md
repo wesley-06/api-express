@@ -31,6 +31,7 @@ npm run dev
 ```
 
 Servidor em `http://localhost:3000`
+Documentação Swagger em `http://localhost:3000/docs`
 
 ---
 
@@ -174,5 +175,8 @@ curl -X DELETE http://localhost:3000/matriculas/1/1
 
 ## Observações
 
+- Os controllers tratam erros do PostgreSQL e retornam status HTTP apropriados:
+  `400` para dados ou referências inválidas, `404` para registros não encontrados,
+  `409` para registros duplicados e `500` para outros erros internos.
 - O `.env` está no `.gitignore` — não versione suas credenciais.
 - Não há autenticação, propositalmente, para fins didáticos.

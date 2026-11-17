@@ -1,6 +1,7 @@
 import banco from '../dados/db.js'
+import tratarErro from './erros.js'
 
-const listar = async (pedido, resposta) => {
+const listar = tratarErro('listar cursos')(async (pedido, resposta) => {
     const { rows } = await banco.query(`
         SELECT c.*,
             COALESCE((
@@ -29,19 +30,19 @@ const listar = async (pedido, resposta) => {
         ORDER BY c.id
     `)
     resposta.json(rows)
-}
+})
 
-const criar = async (pedido, resposta) => {
+const criar = tratarErro('criar curso')(async (pedido, resposta) => {
     const { nome, codigo } = pedido.body
     const { rows } = await banco.query(
         'INSERT INTO cursos (nome, codigo) VALUES ($1,$2) RETURNING *',
         [nome, codigo]
     )
 
-    resposta.json(rows[0])
-}
+    resposta.status(201).json(rows[0])
+})
 
-const editar = async (pedido, resposta) => {
+const editar = tratarErro('editar curso')(async (pedido, resposta) => {
     const { nome, codigo } = pedido.body
     const { id } = pedido.params
 
@@ -50,25 +51,25 @@ const editar = async (pedido, resposta) => {
         [nome, codigo, id])
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'Curso não encontrado!' })
+        return resposta.status(404).json({ mensagem: 'Curso não encontrado!' })
     }
 
     resposta.json({ mensagem: 'Curso editado com sucesso!' })
-}
+})
 
-const deletar = async (pedido, resposta) => {
+const deletar = tratarErro('deletar curso')(async (pedido, resposta) => {
     const { id } = pedido.params
     const resultado = await banco.query('DELETE FROM cursos WHERE id = $1', [id])
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'Curso não encontrado!' })
+        return resposta.status(404).json({ mensagem: 'Curso não encontrado!' })
     }
 
     resposta.json({ mensagem: 'Curso deletado com sucesso!' })
-}
+})
 
 // Vincula uma disciplina ao curso (tabela curso_disciplinas)
-const adicionarDisciplina = async (pedido, resposta) => {
+const adicionarDisciplina = tratarErro('vincular disciplina ao curso')(async (pedido, resposta) => {
     const { id } = pedido.params
     const { disciplina_id } = pedido.body
 
@@ -78,10 +79,10 @@ const adicionarDisciplina = async (pedido, resposta) => {
     )
 
     resposta.json(rows[0])
-}
+})
 
 // Remove o vínculo entre a disciplina e o curso
-const removerDisciplina = async (pedido, resposta) => {
+const removerDisciplina = tratarErro('remover disciplina do curso')(async (pedido, resposta) => {
     const { id, disciplina_id } = pedido.params
 
     const resultado = await banco.query(
@@ -90,14 +91,14 @@ const removerDisciplina = async (pedido, resposta) => {
     )
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'Disciplina não vinculada a este curso!' })
+        return resposta.status(404).json({ mensagem: 'Disciplina não vinculada a este curso!' })
     }
 
     resposta.json({ mensagem: 'Disciplina removida do curso com sucesso!' })
-}
+})
 
 // Vincula um aluno ao curso (tabela aluno_cursos)
-const adicionarAluno = async (pedido, resposta) => {
+const adicionarAluno = tratarErro('vincular aluno ao curso')(async (pedido, resposta) => {
     const { id } = pedido.params
     const { aluno_id } = pedido.body
 
@@ -107,10 +108,10 @@ const adicionarAluno = async (pedido, resposta) => {
     )
 
     resposta.status(201).json(rows[0] ?? { aluno_id: Number(aluno_id), curso_id: Number(id) })
-}
+})
 
 // Remove o vínculo entre o aluno e o curso
-const removerAluno = async (pedido, resposta) => {
+const removerAluno = tratarErro('remover aluno do curso')(async (pedido, resposta) => {
     const { id, aluno_id } = pedido.params
     const resultado = await banco.query(
         'DELETE FROM aluno_cursos WHERE curso_id = $1 AND aluno_id = $2',
@@ -118,11 +119,11 @@ const removerAluno = async (pedido, resposta) => {
     )
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'Aluno não vinculado a este curso!' })
+        return resposta.status(404).json({ mensagem: 'Aluno não vinculado a este curso!' })
     }
 
     resposta.json({ mensagem: 'Aluno removido do curso com sucesso!' })
-}
+})
 
 export {
     listar,

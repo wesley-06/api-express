@@ -1,6 +1,7 @@
 import conexao from '../dados/db.js'
+import tratarErro from './erros.js'
 
-const listar = async (pedido, resposta) => {
+const listar = tratarErro('listar turmas')(async (pedido, resposta) => {
     const { rows } = await conexao.query(`
         SELECT t.*,
             json_build_object(
@@ -28,9 +29,9 @@ const listar = async (pedido, resposta) => {
         ORDER BY t.id
     `)
     resposta.json(rows)
-}
+})
 
-const criar = async (pedido, resposta) => {
+const criar = tratarErro('criar turma')(async (pedido, resposta) => {
     const { nome, disciplina_id, professor_id } = pedido.body
 
     const { rows } = await conexao.query(
@@ -38,10 +39,10 @@ const criar = async (pedido, resposta) => {
         [nome, disciplina_id, professor_id]
     )
 
-    resposta.json(rows[0])
-}
+    resposta.status(201).json(rows[0])
+})
 
-const editar = async (pedido, resposta) => {
+const editar = tratarErro('editar turma')(async (pedido, resposta) => {
     const { id } = pedido.params
     const { nome, disciplina_id, professor_id } = pedido.body
 
@@ -51,20 +52,20 @@ const editar = async (pedido, resposta) => {
     )
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'Turma não encontrada!' })
+        return resposta.status(404).json({ mensagem: 'Turma não encontrada!' })
     }
     resposta.json({ mensagem: 'Turma atualizada com sucesso!' })
-}
+})
 
-const deletar = async (pedido, resposta) => {
+const deletar = tratarErro('deletar turma')(async (pedido, resposta) => {
     const { id } = pedido.params
 
     const resultado = await conexao.query('DELETE FROM turmas WHERE id = $1', [id])
 
     if (resultado.rowCount === 0) {
-        return resposta.json({ mensagem: 'Turma não encontrada!' })
+        return resposta.status(404).json({ mensagem: 'Turma não encontrada!' })
     }
     resposta.json({ mensagem: 'Turma deletada com sucesso!' })
-}
+})
 
 export { listar, criar, editar, deletar }
